@@ -1,0 +1,29 @@
+.lesson-planner-container {
+    padding: 20px;
+  }
+  
+  .day-card {
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .entries-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .entry-card {
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+  }
+  

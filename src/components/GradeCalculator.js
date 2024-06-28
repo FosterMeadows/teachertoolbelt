@@ -20,12 +20,20 @@ const Form = styled('form')(({ theme }) => ({
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(2),
-  maxWidth: 600,
+  maxWidth: 400,
   width: '100%',
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   padding: theme.spacing(1),
+  textAlign: 'center',
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  transition: 'background-color 0.2s',
+  '&:hover': {
+    backgroundColor: '#e3f2fd', // Light blue hover color
+  },
 }));
 
 function GradeCalculator() {
@@ -72,18 +80,18 @@ function GradeCalculator() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell style={{ width: '33%' }}>Points Earned</TableCell>
-                <TableCell style={{ width: '33%' }}>Total Points</TableCell>
-                <TableCell style={{ width: '33%' }}>Percentage</TableCell>
+                <StyledTableCell style={{ width: '33%' }}>Points Earned</StyledTableCell>
+                <StyledTableCell style={{ width: '33%' }}>Total Points</StyledTableCell>
+                <StyledTableCell style={{ width: '33%' }}>Percentage</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {grades.map((grade, index) => (
-                <TableRow key={index}>
+                <StyledTableRow key={index}>
                   <StyledTableCell>{grade.pointsEarned}</StyledTableCell>
                   <StyledTableCell>{grade.totalPoints}</StyledTableCell>
                   <StyledTableCell>{grade.percentage}%</StyledTableCell>
-                </TableRow>
+                </StyledTableRow>
               ))}
             </TableBody>
           </Table>
