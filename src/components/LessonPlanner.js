@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Grid, Button, Card, CardContent } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { firestore } from '../firebaseConfig';
@@ -18,12 +18,11 @@ const addLessonEntry = async (day, week, entry) => {
 };
 
 const LessonPlanner = () => {
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const [currentDayIndex, setCurrentDayIndex] = useState(0);
+  const daysOfWeek = useMemo(() => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], []);
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
   const [entries, setEntries] = useState({});
-  const [newEntries, setNewEntries] = useState(initializeNewEntries());
-  const [isEditing, setIsEditing] = useState(initializeIsEditing());
+  const [newEntries, setNewEntries] = useState(initializeNewEntries(daysOfWeek));
+  const [isEditing, setIsEditing] = useState(initializeIsEditing(daysOfWeek));
 
   useEffect(() => {
     daysOfWeek.forEach(day => {
@@ -120,8 +119,8 @@ const LessonPlanner = () => {
 
   const clearEntries = () => {
     setEntries({});
-    setNewEntries(initializeNewEntries());
-    setIsEditing(initializeIsEditing());
+    setNewEntries(initializeNewEntries(daysOfWeek));
+    setIsEditing(initializeIsEditing(daysOfWeek));
   };
 
   return (
@@ -176,8 +175,7 @@ const LessonPlanner = () => {
   );
 };
 
-const initializeNewEntries = () => {
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const initializeNewEntries = (daysOfWeek) => {
   return daysOfWeek.reduce((acc, day) => {
     acc[day] = {
       title: '',
@@ -191,8 +189,7 @@ const initializeNewEntries = () => {
   }, {});
 };
 
-const initializeIsEditing = () => {
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const initializeIsEditing = (daysOfWeek) => {
   return daysOfWeek.reduce((acc, day) => {
     acc[day] = true; // Start in edit mode
     return acc;
