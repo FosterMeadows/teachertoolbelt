@@ -6,8 +6,6 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import './LessonPlanner.css';
 import EditableCard from './EditableCard';
 import SavedCard from './SavedCard';
-import standards from '../data/standards.json';  // Import the JSON file
-
 
 const addLessonEntry = async (day, week, entry) => {
   try {
@@ -21,16 +19,8 @@ const addLessonEntry = async (day, week, entry) => {
 
 const LessonPlanner = () => {
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const colors = {
-    Monday: '#e3f6f5',
-    Tuesday: '#f6e3e3',
-    Wednesday: '#e3e9f6',
-    Thursday: '#e3f6e9',
-    Friday: '#f6f3e3'
-  };
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
-  const currentDay = daysOfWeek[currentDayIndex];
   const [entries, setEntries] = useState({});
   const [newEntries, setNewEntries] = useState(initializeNewEntries());
   const [isEditing, setIsEditing] = useState(initializeIsEditing());
@@ -39,7 +29,7 @@ const LessonPlanner = () => {
     daysOfWeek.forEach(day => {
       fetchEntries(day, currentWeek);
     });
-  }, [currentWeek]);
+  }, [currentWeek, daysOfWeek]);
 
   const fetchEntries = async (day, week) => {
     const formattedWeek = formatWeek(week);
@@ -136,24 +126,22 @@ const LessonPlanner = () => {
 
   return (
     <div className="lesson-planner-container">
+      <div className="week-navigation">
+        <Button onClick={handlePrevWeek} className="week-nav-button">Previous Week</Button>
+        <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          Week of {formatWeek(currentWeek)}
+        </Typography>
+        <Button onClick={handleNextWeek} className="week-nav-button">Next Week</Button>
+      </div>
       <Grid container spacing={2} justifyContent="center" alignItems="center">
-        <Grid item xs={12}>
-          <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Week of {formatWeek(currentWeek)}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} className="week-nav-button">
-          <Button onClick={handlePrevWeek}>Previous Week</Button>
-        </Grid>
-        <Grid item xs={8}>
-          <div style={{ width: '100%' }}>
+        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '66%' }}>
             {daysOfWeek.map((day, index) => (
               <Accordion key={day}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls={`${day}-content`}
                   id={`${day}-header`}
-                  style={{ backgroundColor: colors[day], borderRadius: '4px' }}
                 >
                   <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 'xx-large' }}>
                     {day} : {formatDay(currentWeek, index)}
@@ -182,9 +170,6 @@ const LessonPlanner = () => {
               </Accordion>
             ))}
           </div>
-        </Grid>
-        <Grid item xs={2} className="week-nav-button">
-          <Button onClick={handleNextWeek}>Next Week</Button>
         </Grid>
       </Grid>
     </div>
