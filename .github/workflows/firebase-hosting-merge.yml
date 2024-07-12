@@ -25,3 +25,4 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEACHER_TOOLBOX_DB684 }}
           projectId: teacher-toolbox-db684
+          channelId: live  # Explicitly set the channelId to live
