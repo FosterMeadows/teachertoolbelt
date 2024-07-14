@@ -5,6 +5,7 @@ import LessonPlanner from './components/LessonPlanner';
 import GradeCalculator from './components/GradeCalculator';
 import ToDo from './components/ToDo';
 import Login from './components/Login';
+import StudentScreen from './components/StudentScreen'; // Import the new component
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { AuthProvider } from './AuthProvider';
 import PrivateRoute from './PrivateRoute';
@@ -30,6 +31,9 @@ function App() {
               </Button>
               <Button color="inherit" component={Link} to="/to-do">
                 To-Do List
+              </Button>
+              <Button color="inherit" component={Link} to="/student-screen">
+                Student Screen
               </Button>
             </Toolbar>
           </AppBar>
@@ -64,6 +68,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <ToDo />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/student-screen"
+              element={
+                <PrivateRoute>
+                  <StudentScreen />
                 </PrivateRoute>
               }
             />

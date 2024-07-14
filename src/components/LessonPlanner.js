@@ -123,52 +123,69 @@ const LessonPlanner = () => {
     setIsEditing(initializeIsEditing(daysOfWeek));
   };
 
+  const dayStyles = {
+    Monday: { backgroundColor: '#BBDEFB' },    // Light Blue
+    Tuesday: { backgroundColor: '#90CAF9' },   // Lighter Blue
+    Wednesday: { backgroundColor: '#64B5F6' }, // Even Lighter Blue
+    Thursday: { backgroundColor: '#42A5F5' },  // Soft Blue
+    Friday: { backgroundColor: '#2196F3' }     // Material Blue
+  };
+
   return (
     <div className="lesson-planner-container">
-      <div className="week-navigation">
-        <Button onClick={handlePrevWeek} className="week-nav-button">Previous Week</Button>
-        <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-          Week of {formatWeek(currentWeek)}
-        </Typography>
-        <Button onClick={handleNextWeek} className="week-nav-button">Next Week</Button>
-      </div>
-      <Grid container spacing={2} justifyContent="center" alignItems="center">
-        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: '66%' }}>
-            {daysOfWeek.map((day, index) => (
-              <Accordion key={day}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls={`${day}-content`}
-                  id={`${day}-header`}
-                >
-                  <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 'xx-large' }}>
-                    {day} : {formatDay(currentWeek, index)}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Card className="day-card" style={{ width: '100%' }}>
-                    <CardContent>
-                      {isEditing[day] ? (
-                        <EditableCard
-                          currentDay={day}
-                          newEntries={newEntries}
-                          handleInputChange={handleInputChange}
-                          handleSaveEntry={handleSaveEntry}
-                        />
-                      ) : (
-                        <SavedCard
-                          currentDay={day}
-                          entries={entries}
-                          handleEditEntry={handleEditEntry}
-                        />
-                      )}
-                    </CardContent>
-                  </Card>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </div>
+      <Grid container spacing={2} justifyContent="center" alignItems="flex-start">
+        <Grid item xs={2}>
+          <Button onClick={handlePrevWeek} className="week-nav-button" fullWidth>
+            <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Previous Week
+            </Typography>
+          </Button>
+        </Grid>
+        <Grid item xs={8} style={{ marginTop: '5%' }}>
+          <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif', textAlign: 'center', fontSize: 'xx-large', marginBottom: '20px' }}>
+            Week of {formatWeek(currentWeek)}
+          </Typography>
+          {daysOfWeek.map((day, index) => (
+            <Accordion key={day}>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls={`${day}-content`}
+                id={`${day}-header`}
+                style={dayStyles[day]}
+              >
+                <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 'xx-large' }}>
+                  {day} : {formatDay(currentWeek, index)}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Card className="day-card" style={{ width: '100%' }}>
+                  <CardContent>
+                    {isEditing[day] ? (
+                      <EditableCard
+                        currentDay={day}
+                        newEntries={newEntries}
+                        handleInputChange={handleInputChange}
+                        handleSaveEntry={handleSaveEntry}
+                      />
+                    ) : (
+                      <SavedCard
+                        currentDay={day}
+                        entries={entries}
+                        handleEditEntry={handleEditEntry}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Grid>
+        <Grid item xs={2}>
+          <Button onClick={handleNextWeek} className="week-nav-button" fullWidth>
+            <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Next Week
+            </Typography>
+          </Button>
         </Grid>
       </Grid>
     </div>
