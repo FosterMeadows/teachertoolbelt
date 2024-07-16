@@ -1,0 +1,7 @@
+
+.rnd-container {
+  border: 2px dashed green;
+  border-radius: 16px;
+  padding: 10px;
+  box-sizing: border-box;
+}

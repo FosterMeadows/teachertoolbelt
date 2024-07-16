@@ -1,6 +1,8 @@
+// src/components/StudentScreen.js
 import React, { useState, useEffect, useRef } from 'react';
 import { Typography, Button, Grid } from '@mui/material';
 import Timer from './Timer';
+import StudentInstructions from './StudentInstructions';
 import { Rnd } from 'react-rnd';
 import { findDOMNode } from 'react-dom';
 
@@ -58,8 +60,7 @@ const StudentScreen = () => {
             borderRadius: '16px',
             padding: '20px 530px 220px 5px', // top, right, bottom, left
             boxSizing: 'border-box'
-          }}          
-          
+          }}              
           onClick={() => setIsSelected(true)}
           onDragStop={handleDragStop}
           onResize={handleResize}
@@ -78,6 +79,7 @@ const StudentScreen = () => {
             <Timer />
           </div>
         </Rnd>
+        <StudentInstructions />
       </>
     );
   };
