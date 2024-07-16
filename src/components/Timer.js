@@ -1,9 +1,12 @@
 // src/components/Timer.js
 import React, { useState, useEffect } from 'react';
+import { Button } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import './Timer.css';
 import { gsap } from 'gsap';
 
-const Timer = ({ scale }) => {
+const Timer = () => {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -39,10 +42,9 @@ const Timer = ({ scale }) => {
   };
 
   return (
-    <div className="wrap" style={{ transform: `scale(${scale})` }}>
-      <h1>Draft <strong>Countdown</strong></h1>
+    <div className="wrap">
+      
       <div className="countdown-container">
-        <button className="time-adjust-button" onClick={handleDecreaseTime}>-</button>
         <div className="countdown" onDoubleClick={handleDoubleClick}>
           <div className="bloc-time min" data-init-value="0">
             <span className="count-title">Minutes</span>
@@ -75,12 +77,13 @@ const Timer = ({ scale }) => {
             </div>
           </div>
         </div>
-        <button className="time-adjust-button" onClick={handleIncreaseTime}>+</button>
       </div>
-      <div className="play-pause-container">
-        <button className="play-pause-button" onClick={handlePlayPause}>
-          {isRunning ? 'Pause' : 'Play'}
-        </button>
+      <div className="control-container">
+        <Button className="time-adjust-button" onClick={handleDecreaseTime}>-</Button>
+        <Button className="play-pause-button" onClick={handlePlayPause}>
+          {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+        </Button>
+        <Button className="time-adjust-button" onClick={handleIncreaseTime}>+</Button>
       </div>
     </div>
   );
