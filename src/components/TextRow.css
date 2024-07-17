@@ -1,0 +1,10 @@
+.text-row-container {
+    position: relative;
+    margin: 10px 0;
+    height: auto;
+    background-color: white; /* Ensure background color for visibility */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+  }
+  

@@ -36,3 +36,19 @@
     transform: rotate(360deg);
   }
 }
+
+.parent-container {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Ensure the parent container takes the full height of the viewport */
+  background-color: #f2f1ed; /* Background color for visibility */
+}
+
+.instructions-container {
+  position: relative;
+  height: 100%; /* Ensure sufficient height for vertical movement */
+}
+
+
+
+

@@ -1,25 +1,35 @@
-// src/components/StudentScreen.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Typography, Button, Grid } from '@mui/material';
 import Timer from './Timer';
-import StudentInstructions from './StudentInstructions';
+import TextRow from './TextRow';
 import { Rnd } from 'react-rnd';
-import { findDOMNode } from 'react-dom';
+import '../App.css'; // Ensure this import is here for the styles
+import './TextRow.css'; // New import for TextRow styles
 
 const StudentScreen = () => {
   const [state, setState] = useState('Green');
-  const [isSelected, setIsSelected] = useState(false);
-  const [position, setPosition] = useState({ x: 150, y: 50 });
-  const [width, setWidth] = useState(500);
-  const [height, setHeight] = useState(200);
-  const [scale, setScale] = useState(1);
+  const [isTimerSelected, setIsTimerSelected] = useState(false);
+  const [isInstructionsSelected, setIsInstructionsSelected] = useState(false);
+  const [timerPosition, setTimerPosition] = useState({ x: 150, y: 50 });
+  const [timerWidth, setTimerWidth] = useState(500);
+  const [timerHeight, setTimerHeight] = useState(200);
+  const [timerScale, setTimerScale] = useState(1);
+  const [textRows, setTextRows] = useState([]);
+  const [instructionsPosition, setInstructionsPosition] = useState({ x: 50, y: 300 });
+
   const timerRef = useRef(null);
+  const instructionsRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const timerNode = findDOMNode(timerRef.current);
-      if (timerNode && !timerNode.contains(event.target)) {
-        setIsSelected(false);
+      if (
+        timerRef.current &&
+        !timerRef.current.contains(event.target) &&
+        instructionsRef.current &&
+        !instructionsRef.current.contains(event.target)
+      ) {
+        setIsTimerSelected(false);
+        setIsInstructionsSelected(false);
       }
     };
 
@@ -29,63 +39,39 @@ const StudentScreen = () => {
     };
   }, []);
 
-  const handleResize = (e, direction, ref, delta, position) => {
+  const handleTimerResize = (e, direction, ref, delta, position) => {
     const scaleFactor = Math.min(ref.offsetWidth / 500, ref.offsetHeight / 200);
-    setScale(scaleFactor);
-    setWidth(ref.offsetWidth);
-    setHeight(ref.offsetHeight);
-    setPosition(position);
+    setTimerScale(scaleFactor);
+    setTimerWidth(ref.offsetWidth);
+    setTimerHeight(ref.offsetHeight);
+    setTimerPosition(position);
   };
 
-  const handleDragStop = (e, d) => {
-    setPosition({ x: d.x, y: d.y });
-    setIsSelected(false);
+  const handleTimerDragStop = (e, d) => {
+    setTimerPosition({ x: d.x, y: d.y });
+    setIsTimerSelected(false);
   };
 
-  const renderContent = () => {
-    return (
-      <>
-        <Typography variant="h5" style={{ color: state === 'Green' ? 'green' : state === 'Yellow' ? 'yellow' : 'red' }}>
-          {state === 'Green' ? 'Green: Social Working' : state === 'Yellow' ? 'Yellow: Chatty Work' : 'Red: Quiet, Focused'}
-        </Typography>
-        <Rnd
-          ref={timerRef}
-          size={{ width, height }}
-          position={position}
-          minWidth={500}
-          minHeight={200}
-          bounds="parent"
-          style={{
-            border: isSelected ? '2px dashed blue' : 'none',
-            borderRadius: '16px',
-            padding: '20px 530px 220px 5px', // top, right, bottom, left
-            boxSizing: 'border-box'
-          }}              
-          onClick={() => setIsSelected(true)}
-          onDragStop={handleDragStop}
-          onResize={handleResize}
-          enableResizing={{
-            top: false,
-            right: false,
-            bottom: false,
-            left: false,
-            topRight: true,
-            bottomRight: true,
-            bottomLeft: true,
-            topLeft: true,
-          }}
-        >
-          <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: '500px', height: '200px' }}>
-            <Timer />
-          </div>
-        </Rnd>
-        <StudentInstructions />
-      </>
-    );
+  const handleInstructionsDragStop = (e, d) => {
+    setInstructionsPosition({ x: d.x, y: d.y });
+    setIsInstructionsSelected(false);
+  };
+
+  const addTextRow = () => {
+    const id = textRows.length > 0 ? textRows[textRows.length - 1].id + 1 : 0;
+    setTextRows([...textRows, { id, text: '' }]);
+  };
+
+  const removeTextRow = (id) => {
+    setTextRows(textRows.filter(row => row.id !== id));
+  };
+
+  const handleTextChange = (id, newText) => {
+    setTextRows(textRows.map(row => (row.id === id ? { ...row, text: newText } : row)));
   };
 
   return (
-    <div style={{ padding: '20px', height: '100vh', position: 'relative' }}>
+    <div className="parent-container">
       <Typography variant="h4" style={{ marginBottom: '20px' }}>Student Screen</Typography>
       <Grid container spacing={2} justifyContent="center" style={{ marginBottom: '20px' }}>
         <Grid item>
@@ -116,8 +102,96 @@ const StudentScreen = () => {
           </Button>
         </Grid>
       </Grid>
-      <div style={{ marginTop: '20px', position: 'relative', height: '100%' }}>
-        {renderContent()}
+
+      <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+        <Typography variant="h5" style={{ color: state === 'Green' ? 'green' : state === 'Yellow' ? 'yellow' : 'red' }}>
+          {state === 'Green' ? 'Green: Social Working' : state === 'Yellow' ? 'Yellow: Chatty Work' : 'Red: Quiet, Focused'}
+        </Typography>
+
+        <Rnd
+          ref={(ref) => {
+            timerRef.current = ref ? ref.resizableElement.current : null;
+          }}
+          size={{ width: timerWidth, height: timerHeight }}
+          position={timerPosition}
+          minWidth={500}
+          minHeight={200}
+          bounds="parent"
+          style={{
+            border: isTimerSelected ? '2px dashed blue' : 'none',
+            borderRadius: '16px',
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+          onClick={() => setIsTimerSelected(true)}
+          onDragStop={handleTimerDragStop}
+          onResize={handleTimerResize}
+          enableResizing={{
+            top: false,
+            right: false,
+            bottom: false,
+            left: false,
+            topRight: true,
+            bottomRight: true,
+            bottomLeft: true,
+            topLeft: true,
+          }}
+        >
+          <div style={{ transform: `scale(${timerScale})`, transformOrigin: 'top left', width: '500px', height: '200px' }}>
+            <Timer />
+          </div>
+        </Rnd>
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={addTextRow}
+          style={{ margin: '20px 0' }}
+        >
+          Add Instruction
+        </Button>
+
+        <Rnd
+          ref={(ref) => {
+            instructionsRef.current = ref ? ref.resizableElement.current : null;
+          }}
+          size={{ width: 'auto', height: 'auto' }}
+          position={instructionsPosition}
+          bounds="parent"
+          dragAxis="both" // Ensure dragging is allowed both vertically and horizontally
+          style={{
+            border: isInstructionsSelected ? '2px dashed blue' : 'none',
+            borderRadius: '16px',
+            padding: '10px',
+            boxSizing: 'border-box',
+            backgroundColor: 'white'
+          }}
+          onClick={() => setIsInstructionsSelected(true)}
+          onDragStop={handleInstructionsDragStop}
+          enableResizing={{
+            top: true,
+            right: true,
+            bottom: true,
+            left: true,
+            topRight: true,
+            bottomRight: true,
+            bottomLeft: true,
+            topLeft: true,
+          }}
+        >
+          <div>
+            {textRows.map(row => (
+              <div key={row.id} className="text-row-container">
+                <TextRow
+                  id={row.id}
+                  text={row.text}
+                  onDelete={removeTextRow}
+                  onTextChange={handleTextChange}
+                />
+              </div>
+            ))}
+          </div>
+        </Rnd>
       </div>
     </div>
   );
