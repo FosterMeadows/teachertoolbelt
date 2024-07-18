@@ -3,8 +3,8 @@ import { Typography, Button, Grid } from '@mui/material';
 import Timer from './Timer';
 import TextRow from './TextRow';
 import { Rnd } from 'react-rnd';
-import '../App.css'; // Ensure this import is here for the styles
-import './TextRow.css'; // New import for TextRow styles
+import '../App.css';
+import './TextRow.css';
 
 const StudentScreen = () => {
   const [state, setState] = useState('Green');
@@ -58,16 +58,18 @@ const StudentScreen = () => {
   };
 
   const addTextRow = () => {
-    const id = textRows.length > 0 ? textRows[textRows.length - 1].id + 1 : 0;
-    setTextRows([...textRows, { id, text: '' }]);
-  };
-
-  const removeTextRow = (id) => {
-    setTextRows(textRows.filter(row => row.id !== id));
+    const newId = textRows.length > 0 ? textRows[textRows.length - 1].id + 1 : 1;
+    setTextRows([...textRows, { id: newId, text: '' }]);
   };
 
   const handleTextChange = (id, newText) => {
+    console.log(`handleTextChange for row ${id}: ${newText}`);
     setTextRows(textRows.map(row => (row.id === id ? { ...row, text: newText } : row)));
+  };
+
+  const handleDelete = (id) => {
+    console.log(`handleDelete for row ${id}`);
+    setTextRows(textRows.filter(row => row.id !== id));
   };
 
   return (
@@ -158,7 +160,7 @@ const StudentScreen = () => {
           size={{ width: 'auto', height: 'auto' }}
           position={instructionsPosition}
           bounds="parent"
-          dragAxis="both" // Ensure dragging is allowed both vertically and horizontally
+          dragAxis="both"
           style={{
             border: isInstructionsSelected ? '2px dashed blue' : 'none',
             borderRadius: '16px',
@@ -185,7 +187,7 @@ const StudentScreen = () => {
                 <TextRow
                   id={row.id}
                   text={row.text}
-                  onDelete={removeTextRow}
+                  onDelete={handleDelete}
                   onTextChange={handleTextChange}
                 />
               </div>

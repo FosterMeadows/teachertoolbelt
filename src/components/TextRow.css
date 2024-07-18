@@ -1,10 +1,42 @@
 .text-row-container {
-    position: relative;
-    margin: 10px 0;
-    height: auto;
-    background-color: white; /* Ensure background color for visibility */
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-  }
-  
+  position: relative;
+  margin: 10px 0; /* Increase vertical margin between rows */
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.text-row-container.editable {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  overflow: hidden; /* Ensure the content doesn't overflow */
+}
+
+.text-row-container.display {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+.text-row-container .display-text {
+  flex: 1;
+  cursor: pointer;
+  word-break: break-word; /* Ensure long text wraps correctly */
+}
+
+.text-row-container.editable .display-text {
+  margin-right: 10px;
+}
+
+.text-row-container .MuiTextField-root {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.text-row-container.display .MuiIconButton-root {
+  display: none;
+}
