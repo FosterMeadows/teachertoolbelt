@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Typography, Button, Grid } from '@mui/material';
+import { Typography, Button, Grid, IconButton } from '@mui/material';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import Timer from './Timer';
 import TextRow from './TextRow';
 import { Rnd } from 'react-rnd';
@@ -8,6 +10,7 @@ import './TextRow.css';
 
 const StudentScreen = () => {
   const [state, setState] = useState('Green');
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [isTimerSelected, setIsTimerSelected] = useState(false);
   const [isInstructionsSelected, setIsInstructionsSelected] = useState(false);
   const [timerPosition, setTimerPosition] = useState({ x: 150, y: 50 });
@@ -19,6 +22,7 @@ const StudentScreen = () => {
 
   const timerRef = useRef(null);
   const instructionsRef = useRef(null);
+  const screenRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -40,11 +44,19 @@ const StudentScreen = () => {
   }, []);
 
   const handleTimerResize = (e, direction, ref, delta, position) => {
-    const scaleFactor = Math.min(ref.offsetWidth / 500, ref.offsetHeight / 200);
+    const newWidth = ref.offsetWidth;
+    const newHeight = ref.offsetHeight;
+    const scaleFactor = Math.min(newWidth / 500, newHeight / 200);
     setTimerScale(scaleFactor);
-    setTimerWidth(ref.offsetWidth);
-    setTimerHeight(ref.offsetHeight);
-    setTimerPosition(position);
+    setTimerWidth(newWidth);
+    setTimerHeight(newHeight);
+
+    // Ensure the position is adjusted to keep the timer within the desired bounds
+    const parentBounds = screenRef.current.getBoundingClientRect();
+    const newPosX = Math.min(position.x, parentBounds.width - newWidth - 400); // 20px padding
+    const newPosY = Math.min(position.y, parentBounds.height - newHeight - 400); // 20px padding
+
+    setTimerPosition({ x: newPosX, y: newPosY });
   };
 
   const handleTimerDragStop = (e, d) => {
@@ -63,18 +75,53 @@ const StudentScreen = () => {
   };
 
   const handleTextChange = (id, newText) => {
-    console.log(`handleTextChange for row ${id}: ${newText}`);
     setTextRows(textRows.map(row => (row.id === id ? { ...row, text: newText } : row)));
   };
 
   const handleDelete = (id) => {
-    console.log(`handleDelete for row ${id}`);
     setTextRows(textRows.filter(row => row.id !== id));
   };
 
+  const getBackgroundImage = () => {
+    switch (state) {
+      case 'Green':
+        return '/GreenModeBackground.svg';
+      case 'Yellow':
+        return '/YellowModeBackground.svg';
+      case 'Red':
+        return '/RedModeBackground.svg';
+      default:
+        return 'none';
+    }
+  };
+
+  const toggleFullScreen = () => {
+    if (!isFullScreen) {
+      if (screenRef.current.requestFullscreen) {
+        screenRef.current.requestFullscreen();
+      } else if (screenRef.current.mozRequestFullScreen) { // Firefox
+        screenRef.current.mozRequestFullScreen();
+      } else if (screenRef.current.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        screenRef.current.webkitRequestFullscreen();
+      } else if (screenRef.current.msRequestFullscreen) { // IE/Edge
+        screenRef.current.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { // Firefox
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { // IE/Edge
+        document.msExitFullscreen();
+      }
+    }
+    setIsFullScreen(!isFullScreen);
+  };
+
   return (
-    <div className="parent-container">
-      <Typography variant="h4" style={{ marginBottom: '20px' }}>Student Screen</Typography>
+    <div ref={screenRef} className="parent-container" style={{ backgroundImage: `url(${getBackgroundImage()})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '100vh', width: '100%' }}>
       <Grid container spacing={2} justifyContent="center" style={{ marginBottom: '20px' }}>
         <Grid item>
           <Button
@@ -103,13 +150,14 @@ const StudentScreen = () => {
             Red
           </Button>
         </Grid>
+        <Grid item>
+          <IconButton color="inherit" onClick={toggleFullScreen}>
+            {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+          </IconButton>
+        </Grid>
       </Grid>
 
       <div style={{ position: 'relative', height: '100%', width: '100%' }}>
-        <Typography variant="h5" style={{ color: state === 'Green' ? 'green' : state === 'Yellow' ? 'yellow' : 'red' }}>
-          {state === 'Green' ? 'Green: Social Working' : state === 'Yellow' ? 'Yellow: Chatty Work' : 'Red: Quiet, Focused'}
-        </Typography>
-
         <Rnd
           ref={(ref) => {
             timerRef.current = ref ? ref.resizableElement.current : null;

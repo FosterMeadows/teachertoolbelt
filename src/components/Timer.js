@@ -168,9 +168,10 @@ const Countdown = {
       rotationX: '-180deg',
       transformPerspective: 300,
       ease: 'power1.out',
+      borderRadius: '8px',  // Ensure border-radius is set
       onComplete: function () {
         $top.innerHTML = value;
-        gsap.set($top, { rotationX: 0 });
+        gsap.set($top, { rotationX: 0, borderRadius: '8px' });  // Ensure border-radius is set
       }
     });
 
@@ -179,7 +180,8 @@ const Countdown = {
       rotationX: 0,
       transformPerspective: 300,
       ease: 'power1.out',
-      clearProps: 'all'
+      clearProps: 'all',
+      borderRadius: '8px'  // Ensure border-radius is set
     });
 
     gsap.to($bottom, {
@@ -187,9 +189,10 @@ const Countdown = {
       rotationX: '-180deg',
       transformPerspective: 300,
       ease: 'power1.out',
+      borderRadius: '8px',  // Ensure border-radius is set
       onComplete: function () {
         $bottom.innerHTML = value;
-        gsap.set($bottom, { rotationX: 0 });
+        gsap.set($bottom, { rotationX: 0, borderRadius: '8px' });  // Ensure border-radius is set
       }
     });
 
@@ -198,7 +201,8 @@ const Countdown = {
       rotationX: 0,
       transformPerspective: 300,
       ease: 'power1.out',
-      clearProps: 'all'
+      clearProps: 'all',
+      borderRadius: '8px'  // Ensure border-radius is set
     });
   },
 

@@ -4,9 +4,7 @@
   height: 310px;
 }
 
-body {
-  background-color: #f2f1ed;
-}
+
 
 .countdown-container {
   display: flex;
@@ -184,4 +182,11 @@ body {
 
 .play-pause-button:active {
   background-color: #d7d7f7;
+}
+
+.figure .top,
+.figure .bottom-back,
+.figure .top-back,
+.figure .bottom {
+  border-radius: 8px;  /* Add this if not already present */
 }
