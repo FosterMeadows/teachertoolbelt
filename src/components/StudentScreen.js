@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Typography, Button, Grid, IconButton } from '@mui/material';
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+// import { Typography, Button, Grid } from '@mui/material'; // Remove Typography if not used
+import { Button, Grid } from '@mui/material'; // Keep the other imports if they are used
 import Timer from './Timer';
 import TextRow from './TextRow';
 import { Rnd } from 'react-rnd';
