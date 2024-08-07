@@ -1,15 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Typography, Button } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import StandardsModal from './StandardsModal'; // Ensure the correct path
+import StandardsModal from './StandardsModal';
 
 const EditableCard = ({ currentDay, newEntries, handleInputChange, handleSaveEntry }) => {
-  const objectiveRef = useRef(null);
-  const prepRef = useRef(null);
-  const planRef = useRef(null);
-  const reflectionRef = useRef(null);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedStandards, setSelectedStandards] = useState(newEntries[currentDay].standards ? newEntries[currentDay].standards.split('\n') : []);
 
@@ -38,39 +33,27 @@ const EditableCard = ({ currentDay, newEntries, handleInputChange, handleSaveEnt
         setSelectedStandards={setSelectedStandards}
       />
       <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }} variant="subtitle1" className="header" gutterBottom>
-        Objective
-      </Typography>
-      <ReactQuill
-        ref={objectiveRef}
-        value={newEntries[currentDay].objective}
-        onChange={(value) => handleInputChange(currentDay, 'objective', value)}
-        style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif' }}
-      />
-      <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }} variant="subtitle1" className="header" gutterBottom>
         Prep
       </Typography>
       <ReactQuill
-        ref={prepRef}
         value={newEntries[currentDay].prep}
         onChange={(value) => handleInputChange(currentDay, 'prep', value)}
         style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif' }}
       />
       <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }} variant="subtitle1" className="header" gutterBottom>
-        Plan
+        ELA Plan
       </Typography>
       <ReactQuill
-        ref={planRef}
-        value={newEntries[currentDay].plan}
-        onChange={(value) => handleInputChange(currentDay, 'plan', value)}
+        value={newEntries[currentDay].elaplan}
+        onChange={(value) => handleInputChange(currentDay, 'elaplan', value)}
         style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif' }}
       />
       <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }} variant="subtitle1" className="header" gutterBottom>
-        Reflection
+        Writing is Pog Plan
       </Typography>
       <ReactQuill
-        ref={reflectionRef}
-        value={newEntries[currentDay].reflection}
-        onChange={(value) => handleInputChange(currentDay, 'reflection', value)}
+        value={newEntries[currentDay].writingispogplan}
+        onChange={(value) => handleInputChange(currentDay, 'writingispogplan', value)}
         style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif' }}
       />
       <Button onClick={handleSave}>Save</Button>

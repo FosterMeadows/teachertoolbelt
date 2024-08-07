@@ -56,10 +56,9 @@ const LessonPlanner = () => {
         [day]: {
           title: '',
           standards: '',
-          objective: '',
           prep: '',
-          plan: '',
-          reflection: ''
+          elaplan: '',
+          writingispogplan: ''
         }
       }));
       setNewEntries(prevEntries => ({
@@ -67,10 +66,9 @@ const LessonPlanner = () => {
         [day]: {
           title: '',
           standards: '',
-          objective: '',
           prep: '',
-          plan: '',
-          reflection: ''
+          elaplan: '',
+          writingispogplan: ''
         }
       }));
       setIsEditing(prevEditing => ({
@@ -81,23 +79,23 @@ const LessonPlanner = () => {
   };
 
   const handleInputChange = (day, name, value) => {
-    setNewEntries({
-      ...newEntries,
-      [day]: { ...newEntries[day], [name]: value }
-    });
+    setNewEntries(prevEntries => ({
+      ...prevEntries,
+      [day]: { ...prevEntries[day], [name]: value }
+    }));
   };
-
+  
   const handleSaveEntry = async (day) => {
     const newEntry = newEntries[day];
     await addLessonEntry(day.toLowerCase(), formatWeek(currentWeek), newEntry);
-    setEntries({
-      ...entries,
+    setEntries(prevEntries => ({
+      ...prevEntries,
       [day]: newEntry
-    });
-    setIsEditing({
-      ...isEditing,
+    }));
+    setIsEditing(prevEditing => ({
+      ...prevEditing,
       [day]: false
-    });
+    }));
   };
 
   const handleEditEntry = (day) => {
@@ -197,11 +195,10 @@ const initializeNewEntries = (daysOfWeek) => {
     acc[day] = {
       title: '',
       standards: '',
-      objective: '',
       prep: '',
-      plan: '',
-      reflection: ''
-    };
+      elaplan: '',
+      writingispogplan: ''
+    }
     return acc;
   }, {});
 };

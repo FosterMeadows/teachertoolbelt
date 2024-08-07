@@ -17,13 +17,6 @@ const SavedCard = ({ currentDay, entries, handleEditEntry }) => {
         ))}
       </List>
       <div className="header" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-        <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }}>Objective</Typography>
-      </div>
-      <Typography
-        dangerouslySetInnerHTML={{ __html: entries[currentDay]?.objective }}
-        style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: 'large' }}
-      />
-      <div className="header" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
         <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }}>Prep</Typography>
       </div>
       <Typography
@@ -31,17 +24,17 @@ const SavedCard = ({ currentDay, entries, handleEditEntry }) => {
         style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: 'large' }}
       />
       <div className="header" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-        <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }}>Plan</Typography>
+        <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }}>ELA Plan</Typography>
       </div>
       <Typography
-        dangerouslySetInnerHTML={{ __html: entries[currentDay]?.plan }}
+        dangerouslySetInnerHTML={{ __html: entries[currentDay]?.elaplan }}
         style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: 'large' }}
       />
       <div className="header" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-        <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }}>Reflection</Typography>
+        <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20 }}>Writing is Pog Plan</Typography>
       </div>
       <Typography
-        dangerouslySetInnerHTML={{ __html: entries[currentDay]?.reflection }}
+        dangerouslySetInnerHTML={{ __html: entries[currentDay]?.writingispogplan }}
         style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: 'large' }}
       />
     </div>
