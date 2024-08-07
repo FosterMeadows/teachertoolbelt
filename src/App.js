@@ -5,8 +5,6 @@ import LessonPlanner from './components/LessonPlanner';
 import GradeCalculator from './components/GradeCalculator';
 import ToDo from './components/ToDo';
 import Login from './components/Login';
-import StudentScreen from './components/StudentScreen';
-import TestTextRow from './components/TestTextRow'; // Import the TestTextRow component
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { AuthProvider } from './AuthProvider';
 import PrivateRoute from './PrivateRoute';
@@ -33,12 +31,8 @@ function App() {
               <Button color="inherit" component={Link} to="/to-do">
                 To-Do List
               </Button>
-              <Button color="inherit" component={Link} to="/student-screen">
-                Student Screen
-              </Button>
-              <Button color="inherit" component={Link} to="/test-text-row">
-                Test TextRow
-              </Button>
+             
+             
             </Toolbar>
           </AppBar>
           <Routes>
@@ -72,22 +66,6 @@ function App() {
               element={
                 <PrivateRoute>
                   <ToDo />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/student-screen"
-              element={
-                <PrivateRoute>
-                  <StudentScreen />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/test-text-row"
-              element={
-                <PrivateRoute>
-                  <TestTextRow />
                 </PrivateRoute>
               }
             />
