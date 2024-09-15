@@ -45,13 +45,9 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
+                      <Route
               path="/lesson-planner"
-              element={
-                <PrivateRoute>
-                  <LessonPlanner />
-                </PrivateRoute>
-              }
+              element={<LessonPlanner />}
             />
             <Route
               path="/grade-calculator"

@@ -16,6 +16,8 @@ import './LessonPlanner.css';
 import EditableCard from './EditableCard';
 import SavedCard from './SavedCard';
 import { startOfWeek, addWeeks, format, addDays } from 'date-fns';
+import { useAuth } from '../AuthProvider';
+
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -39,6 +41,10 @@ const addLessonEntry = async (day, week, entry) => {
 };
 
 const LessonPlanner = () => {
+
+  const { user } = useAuth(); // Get the authenticated user
+
+
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
   const [entries, setEntries] = useState({});
   const [isEditing, setIsEditing] = useState({});
@@ -79,7 +85,7 @@ const LessonPlanner = () => {
           {}
         );
         const newIsEditing = results.reduce(
-          (acc, { day, isEditing }) => ({ ...acc, [day]: isEditing }),
+          (acc, { day }) => ({ ...acc, [day]: user ? true : false }), // Set isEditing based on user authentication
           {}
         );
         setEntries(newEntries);
@@ -93,7 +99,7 @@ const LessonPlanner = () => {
     };
 
     fetchAllEntries();
-  }, [currentWeek]);
+  }, [currentWeek, user]);
 
   const handleInputChange = (day, name, value) => {
     setEntries((prevEntries) => ({
@@ -124,7 +130,9 @@ const LessonPlanner = () => {
   };
 
   const handleEditEntry = (day) => {
-    setIsEditing((prev) => ({ ...prev, [day]: true }));
+    if (user) {
+      setIsEditing((prev) => ({ ...prev, [day]: true }));
+    }
   };
 
   const handleNextWeek = () => {
@@ -222,10 +230,11 @@ const LessonPlanner = () => {
                       />
                     ) : (
                       <SavedCard
-                        currentDay={day}
-                        entry={entries[day]}
-                        handleEditEntry={handleEditEntry}
-                      />
+  currentDay={day}
+  entry={entries[day]}
+  handleEditEntry={handleEditEntry}
+  user={user} // Pass the user prop
+/>
                     )}
                   </CardContent>
                 </Card>

@@ -2,11 +2,22 @@ import React from 'react';
 import { Typography, Chip, Box, Tooltip } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.bubble.css';
+import { useAuth } from '../AuthProvider'; // Import useAuth
+
 
 const SavedCard = ({ currentDay, entry, handleEditEntry }) => {
+  const { user } = useAuth(); // Get the authenticated user
   const standards = entry?.standards || [];
 
+  const handleClick = () => {
+    if (user) {
+      handleEditEntry(currentDay);
+    }
+  };
+
   return (
+    <div onClick={handleClick}>
+
     <div onClick={() => handleEditEntry(currentDay)}>
       {/* Standards Section */}
       <Box
@@ -105,6 +116,8 @@ const SavedCard = ({ currentDay, entry, handleEditEntry }) => {
         style={{ marginBottom: '10px' }}
       />
     </div>
+    </div>
+
   );
 };
 
