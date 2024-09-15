@@ -103,7 +103,7 @@ const addLessonEntry = async (day, week, entry) => {
     };
 
     fetchAllEntries();
-  }, [currentWeek, user]);
+  }, [currentWeek, user, isOwner]);
 
   const handleInputChange = (day, name, value) => {
     setEntries((prevEntries) => ({
