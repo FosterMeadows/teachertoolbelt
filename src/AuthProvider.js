@@ -1,11 +1,9 @@
-// src/AuthProvider.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebaseConfig';
 
 export const AuthContext = createContext();
 
-// Add the useAuth hook
 export const useAuth = () => {
   return useContext(AuthContext);
 };

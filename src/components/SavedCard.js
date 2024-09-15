@@ -4,13 +4,16 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.bubble.css';
 import { useAuth } from '../AuthProvider'; // Import useAuth
 
+const MY_EMAIL = 'foster.meadows@gmail.com'; // Replace with your actual email
+
 
 const SavedCard = ({ currentDay, entry, handleEditEntry }) => {
-  const { user } = useAuth(); // Get the authenticated user
+  const { user } = useAuth();
+  const isOwner = user && user.email === MY_EMAIL;
   const standards = entry?.standards || [];
 
   const handleClick = () => {
-    if (user) {
+    if (isOwner) {
       handleEditEntry(currentDay);
     }
   };

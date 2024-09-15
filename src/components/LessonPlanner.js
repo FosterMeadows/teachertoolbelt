@@ -18,6 +18,8 @@ import SavedCard from './SavedCard';
 import { startOfWeek, addWeeks, format, addDays } from 'date-fns';
 import { useAuth } from '../AuthProvider';
 
+const MY_EMAIL = 'foster.meadows@gmail.com'; // Replace with your actual email
+
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -40,9 +42,11 @@ const addLessonEntry = async (day, week, entry) => {
   }
 };
 
-const LessonPlanner = () => {
 
-  const { user } = useAuth(); // Get the authenticated user
+
+  const LessonPlanner = () => {
+    const { user } = useAuth();
+    const isOwner = user && user.email === MY_EMAIL;
 
 
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
@@ -85,7 +89,7 @@ const LessonPlanner = () => {
           {}
         );
         const newIsEditing = results.reduce(
-          (acc, { day }) => ({ ...acc, [day]: user ? true : false }), // Set isEditing based on user authentication
+          (acc, { day }) => ({ ...acc, [day]: isOwner ? false : false }),
           {}
         );
         setEntries(newEntries);
@@ -130,10 +134,11 @@ const LessonPlanner = () => {
   };
 
   const handleEditEntry = (day) => {
-    if (user) {
+    if (isOwner) {
       setIsEditing((prev) => ({ ...prev, [day]: true }));
     }
   };
+  
 
   const handleNextWeek = () => {
     setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
