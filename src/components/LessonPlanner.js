@@ -1,124 +1,138 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Accordion, AccordionSummary, AccordionDetails, Typography, Grid, Button, Card, CardContent } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  Grid,
+  Button,
+  Card,
+  CardContent
+} from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { firestore } from '../firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import './LessonPlanner.css';
 import EditableCard from './EditableCard';
 import SavedCard from './SavedCard';
+import { startOfWeek, addWeeks, format, addDays } from 'date-fns';
+
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+const emptyEntry = {
+  standards: [],
+  prep: '',
+  elaplan: '',
+  writingispogplan: '',
+  core: '', // Added 'core' field
+};
 
 const addLessonEntry = async (day, week, entry) => {
   try {
-    const docRef = doc(firestore, 'lesson_planner', `${week}_${day.toLowerCase()}`);
+    const docRef = doc(firestore, 'lesson_planner', `${week}_${day}`);
     await setDoc(docRef, entry, { merge: true });
     console.log('Lesson entry added successfully');
   } catch (error) {
     console.error('Error adding lesson entry: ', error);
+    throw error;
   }
 };
 
 const LessonPlanner = () => {
-  const daysOfWeek = useMemo(() => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], []);
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
   const [entries, setEntries] = useState({});
-  const [newEntries, setNewEntries] = useState(initializeNewEntries(daysOfWeek));
-  const [isEditing, setIsEditing] = useState(initializeIsEditing(daysOfWeek));
+  const [isEditing, setIsEditing] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    daysOfWeek.forEach(day => {
-      fetchEntries(day, currentWeek);
-    });
-  }, [currentWeek, daysOfWeek]);
+    const fetchAllEntries = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const formattedWeek = formatWeek(currentWeek);
+        const fetchPromises = daysOfWeek.map(async (day) => {
+          const docRef = doc(
+            firestore,
+            'lesson_planner',
+            `${formattedWeek}_${day.toLowerCase()}`
+          );
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            // Parse standards if stored as a string
+            if (data.standards && typeof data.standards === 'string') {
+              const standardsArray = data.standards.split('\n').map((standardText) => {
+                const [number, text] = standardText.split(': ', 2);
+                return { id: number.trim(), number: number.trim(), text: text.trim() };
+              });
+              data.standards = standardsArray;
+            }
+            return { day, data, isEditing: false };
+          } else {
+            return { day, data: { ...emptyEntry }, isEditing: true };
+          }
+        });
+        const results = await Promise.all(fetchPromises);
+        const newEntries = results.reduce(
+          (acc, { day, data }) => ({ ...acc, [day]: data }),
+          {}
+        );
+        const newIsEditing = results.reduce(
+          (acc, { day, isEditing }) => ({ ...acc, [day]: isEditing }),
+          {}
+        );
+        setEntries(newEntries);
+        setIsEditing(newIsEditing);
+      } catch (err) {
+        console.error('Error fetching entries:', err);
+        setError('Failed to load entries.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchEntries = async (day, week) => {
-    const formattedWeek = formatWeek(week);
-    const docRef = doc(firestore, 'lesson_planner', `${formattedWeek}_${day.toLowerCase()}`);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const entryData = docSnap.data();
-      setEntries(prevEntries => ({
-        ...prevEntries,
-        [day]: entryData
-      }));
-      setNewEntries(prevEntries => ({
-        ...prevEntries,
-        [day]: entryData
-      }));
-      setIsEditing(prevEditing => ({
-        ...prevEditing,
-        [day]: false
-      }));
-      console.log(`Data found for ${day} in week ${formattedWeek}: `, entryData);
-    } else {
-      console.log(`No data found for ${day} in week ${formattedWeek}`);
-      setEntries(prevEntries => ({
-        ...prevEntries,
-        [day]: {
-          title: '',
-          standards: '',
-          prep: '',
-          elaplan: '',
-          writingispogplan: ''
-        }
-      }));
-      setNewEntries(prevEntries => ({
-        ...prevEntries,
-        [day]: {
-          title: '',
-          standards: '',
-          prep: '',
-          elaplan: '',
-          writingispogplan: ''
-        }
-      }));
-      setIsEditing(prevEditing => ({
-        ...prevEditing,
-        [day]: true
-      }));
+    fetchAllEntries();
+  }, [currentWeek]);
+
+  const handleInputChange = (day, name, value) => {
+    setEntries((prevEntries) => ({
+      ...prevEntries,
+      [day]: {
+        ...prevEntries[day],
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleSaveEntry = async (day) => {
+    const entry = entries[day];
+    try {
+      // Serialize standards to a string before saving
+      const entryToSave = {
+        ...entry,
+        standards: entry.standards
+          .map((standard) => `${standard.number}: ${standard.text}`)
+          .join('\n'),
+      };
+      await addLessonEntry(day.toLowerCase(), formatWeek(currentWeek), entryToSave);
+      setIsEditing((prev) => ({ ...prev, [day]: false }));
+    } catch (err) {
+      console.error('Error saving entry:', err);
+      setError('Failed to save entry.');
     }
   };
 
-  const handleInputChange = (day, name, value) => {
-    setNewEntries(prevEntries => ({
-      ...prevEntries,
-      [day]: { ...prevEntries[day], [name]: value }
-    }));
-  };
-  
-  const handleSaveEntry = async (day) => {
-    const newEntry = newEntries[day];
-    await addLessonEntry(day.toLowerCase(), formatWeek(currentWeek), newEntry);
-    setEntries(prevEntries => ({
-      ...prevEntries,
-      [day]: newEntry
-    }));
-    setIsEditing(prevEditing => ({
-      ...prevEditing,
-      [day]: false
-    }));
-  };
-
   const handleEditEntry = (day) => {
-    setIsEditing({
-      ...isEditing,
-      [day]: true
-    });
+    setIsEditing((prev) => ({ ...prev, [day]: true }));
   };
 
   const handleNextWeek = () => {
     setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
-    clearEntries();
   };
 
   const handlePrevWeek = () => {
     setCurrentWeek((prevWeek) => addWeeks(prevWeek, -1));
-    clearEntries();
-  };
-
-  const clearEntries = () => {
-    setEntries({});
-    setNewEntries(initializeNewEntries(daysOfWeek));
-    setIsEditing(initializeIsEditing(daysOfWeek));
   };
 
   const dayStyles = {
@@ -129,18 +143,54 @@ const LessonPlanner = () => {
     Friday: { backgroundColor: '#2196F3' }     // Material Blue
   };
 
+  if (loading) {
+    return (
+      <div className="lesson-planner-container">
+        <Typography variant="h6" style={{ textAlign: 'center', marginTop: '20px' }}>
+          Loading...
+        </Typography>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="lesson-planner-container">
+        <Typography
+          variant="h6"
+          style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}
+        >
+          Error: {error}
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div className="lesson-planner-container">
       <Grid container spacing={2} justifyContent="center" alignItems="flex-start">
         <Grid item xs={2}>
           <Button onClick={handlePrevWeek} className="week-nav-button" fullWidth>
-            <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <Typography
+              variant="h6"
+              className="week-label"
+              style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+            >
               Previous Week
             </Typography>
           </Button>
         </Grid>
         <Grid item xs={8} style={{ marginTop: '5%' }}>
-          <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif', textAlign: 'center', fontSize: 'xx-large', marginBottom: '20px' }}>
+          <Typography
+            variant="h6"
+            className="week-label"
+            style={{
+              fontFamily: 'Space Grotesk, sans-serif',
+              textAlign: 'center',
+              fontSize: 'xx-large',
+              marginBottom: '20px',
+            }}
+          >
             Week of {formatWeek(currentWeek)}
           </Typography>
           {daysOfWeek.map((day, index) => (
@@ -151,7 +201,12 @@ const LessonPlanner = () => {
                 id={`${day}-header`}
                 style={dayStyles[day]}
               >
-                <Typography style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 'xx-large' }}>
+                <Typography
+                  style={{
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontSize: 'xx-large',
+                  }}
+                >
                   {day} : {formatDay(currentWeek, index)}
                 </Typography>
               </AccordionSummary>
@@ -161,14 +216,14 @@ const LessonPlanner = () => {
                     {isEditing[day] ? (
                       <EditableCard
                         currentDay={day}
-                        newEntries={newEntries}
+                        entry={entries[day]}
                         handleInputChange={handleInputChange}
                         handleSaveEntry={handleSaveEntry}
                       />
                     ) : (
                       <SavedCard
                         currentDay={day}
-                        entries={entries}
+                        entry={entries[day]}
                         handleEditEntry={handleEditEntry}
                       />
                     )}
@@ -180,7 +235,11 @@ const LessonPlanner = () => {
         </Grid>
         <Grid item xs={2}>
           <Button onClick={handleNextWeek} className="week-nav-button" fullWidth>
-            <Typography variant="h6" className="week-label" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <Typography
+              variant="h6"
+              className="week-label"
+              style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+            >
               Next Week
             </Typography>
           </Button>
@@ -190,47 +249,17 @@ const LessonPlanner = () => {
   );
 };
 
-const initializeNewEntries = (daysOfWeek) => {
-  return daysOfWeek.reduce((acc, day) => {
-    acc[day] = {
-      title: '',
-      standards: '',
-      prep: '',
-      elaplan: '',
-      writingispogplan: ''
-    }
-    return acc;
-  }, {});
-};
-
-const initializeIsEditing = (daysOfWeek) => {
-  return daysOfWeek.reduce((acc, day) => {
-    acc[day] = true; // Start in edit mode
-    return acc;
-  }, {});
-};
-
 const getCurrentWeek = () => {
-  const currentDate = new Date();
-  const startOfWeek = currentDate.getDate() - currentDate.getDay() + 1; // Assuming week starts on Monday
-  return new Date(currentDate.setDate(startOfWeek));
-};
-
-const addWeeks = (date, weeks) => {
-  const newDate = new Date(date);
-  newDate.setDate(newDate.getDate() + weeks * 7);
-  return newDate;
+  return startOfWeek(new Date(), { weekStartsOn: 1 }); // Week starts on Monday
 };
 
 const formatWeek = (date) => {
-  return date.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+  return format(date, 'yyyy-MM-dd'); // Format as 'YYYY-MM-DD'
 };
 
 const formatDay = (startOfWeek, dayIndex) => {
-  const date = new Date(startOfWeek);
-  date.setDate(date.getDate() + dayIndex);
-  const options = { month: 'short', day: 'numeric' };
-  return new Intl.DateTimeFormat('en-US', options).format(date);
+  const date = addDays(startOfWeek, dayIndex);
+  return format(date, 'MMM dd');
 };
 
 export default LessonPlanner;
