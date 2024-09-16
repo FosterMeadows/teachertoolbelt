@@ -7,7 +7,7 @@ import {
   Grid,
   Button,
   Card,
-  CardContent
+  CardContent,
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { firestore } from '../firebaseConfig';
@@ -20,7 +20,6 @@ import { useAuth } from '../AuthProvider';
 
 const MY_EMAIL = 'foster.meadows@gmail.com'; // Replace with your actual email
 
-
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 const emptyEntry = {
@@ -28,7 +27,7 @@ const emptyEntry = {
   prep: '',
   elaplan: '',
   writingispogplan: '',
-  core: '', // Added 'core' field
+  core: '',
 };
 
 const addLessonEntry = async (day, week, entry) => {
@@ -42,12 +41,8 @@ const addLessonEntry = async (day, week, entry) => {
   }
 };
 
-
-
-  const LessonPlanner = () => {
-    const { user } = useAuth();
-    const isOwner = user && user.email === MY_EMAIL;
-
+const LessonPlanner = () => {
+  const { user } = useAuth();
 
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
   const [entries, setEntries] = useState({});
@@ -56,6 +51,8 @@ const addLessonEntry = async (day, week, entry) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const isOwner = user && user.email === MY_EMAIL;
+
     const fetchAllEntries = async () => {
       setLoading(true);
       setError(null);
@@ -77,10 +74,12 @@ const addLessonEntry = async (day, week, entry) => {
                 return { id: number.trim(), number: number.trim(), text: text.trim() };
               });
               data.standards = standardsArray;
+            } else if (!data.standards) {
+              data.standards = [];
             }
-            return { day, data, isEditing: false };
+            return { day, data };
           } else {
-            return { day, data: { ...emptyEntry }, isEditing: true };
+            return { day, data: { ...emptyEntry } };
           }
         });
         const results = await Promise.all(fetchPromises);
@@ -89,7 +88,7 @@ const addLessonEntry = async (day, week, entry) => {
           {}
         );
         const newIsEditing = results.reduce(
-          (acc, { day }) => ({ ...acc, [day]: isOwner ? false : false }),
+          (acc, { day }) => ({ ...acc, [day]: false }),
           {}
         );
         setEntries(newEntries);
@@ -103,14 +102,14 @@ const addLessonEntry = async (day, week, entry) => {
     };
 
     fetchAllEntries();
-  }, [currentWeek, user, isOwner]);
+  }, [currentWeek, user]);
 
   const handleInputChange = (day, name, value) => {
     setEntries((prevEntries) => ({
       ...prevEntries,
       [day]: {
         ...prevEntries[day],
-        [name]: value,
+        [name]: name === 'standards' ? value || [] : value,
       },
     }));
   };
@@ -118,10 +117,12 @@ const addLessonEntry = async (day, week, entry) => {
   const handleSaveEntry = async (day) => {
     const entry = entries[day];
     try {
+      // Ensure standards is an array before mapping
+      const standardsArray = Array.isArray(entry.standards) ? entry.standards : [];
       // Serialize standards to a string before saving
       const entryToSave = {
         ...entry,
-        standards: entry.standards
+        standards: standardsArray
           .map((standard) => `${standard.number}: ${standard.text}`)
           .join('\n'),
       };
@@ -134,11 +135,11 @@ const addLessonEntry = async (day, week, entry) => {
   };
 
   const handleEditEntry = (day) => {
+    const isOwner = user && user.email === MY_EMAIL;
     if (isOwner) {
       setIsEditing((prev) => ({ ...prev, [day]: true }));
     }
   };
-  
 
   const handleNextWeek = () => {
     setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
@@ -153,7 +154,7 @@ const addLessonEntry = async (day, week, entry) => {
     Tuesday: { backgroundColor: '#90CAF9' },   // Lighter Blue
     Wednesday: { backgroundColor: '#64B5F6' }, // Even Lighter Blue
     Thursday: { backgroundColor: '#42A5F5' },  // Soft Blue
-    Friday: { backgroundColor: '#2196F3' }     // Material Blue
+    Friday: { backgroundColor: '#2196F3' },    // Material Blue
   };
 
   if (loading) {
@@ -179,8 +180,18 @@ const addLessonEntry = async (day, week, entry) => {
     );
   }
 
+  const isOwner = user && user.email === MY_EMAIL;
+
   return (
     <div className="lesson-planner-container">
+      {!isOwner && (
+        <Typography
+          variant="subtitle1"
+          style={{ textAlign: 'center', color: 'gray', marginTop: '10px' }}
+        >
+          You are viewing in read-only mode.
+        </Typography>
+      )}
       <Grid container spacing={2} justifyContent="center" alignItems="flex-start">
         <Grid item xs={2}>
           <Button onClick={handlePrevWeek} className="week-nav-button" fullWidth>
@@ -235,11 +246,10 @@ const addLessonEntry = async (day, week, entry) => {
                       />
                     ) : (
                       <SavedCard
-  currentDay={day}
-  entry={entries[day]}
-  handleEditEntry={handleEditEntry}
-  user={user} // Pass the user prop
-/>
+                        currentDay={day}
+                        entry={entries[day]}
+                        handleEditEntry={handleEditEntry}
+                      />
                     )}
                   </CardContent>
                 </Card>
