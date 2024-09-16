@@ -43,6 +43,7 @@ const addLessonEntry = async (day, week, entry) => {
 
 const LessonPlanner = () => {
   const { user } = useAuth();
+  const isOwner = user && user.email === MY_EMAIL;
 
   const [currentWeek, setCurrentWeek] = useState(getCurrentWeek());
   const [entries, setEntries] = useState({});
@@ -51,8 +52,6 @@ const LessonPlanner = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const isOwner = user && user.email === MY_EMAIL;
-
     const fetchAllEntries = async () => {
       setLoading(true);
       setError(null);
@@ -135,7 +134,6 @@ const LessonPlanner = () => {
   };
 
   const handleEditEntry = (day) => {
-    const isOwner = user && user.email === MY_EMAIL;
     if (isOwner) {
       setIsEditing((prev) => ({ ...prev, [day]: true }));
     }
@@ -179,8 +177,6 @@ const LessonPlanner = () => {
       </div>
     );
   }
-
-  const isOwner = user && user.email === MY_EMAIL;
 
   return (
     <div className="lesson-planner-container">
